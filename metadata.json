@@ -1,0 +1,6 @@
+{
+  "name": "TradingView Markets",
+  "description": "Professional financial markets terminal featuring live indices, candlestick charts, technical gauges, market heatmap, and paper trading.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
