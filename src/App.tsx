@@ -8,19 +8,51 @@ import { StockDetailModal } from './components/StockDetailModal';
 import { SearchModal } from './components/SearchModal';
 import { ProRightDock } from './components/ProRightDock';
 import { Footer } from './components/Footer';
-import { CategoryType, ThemeMode, StockMover, MarketIndex, ProDockTab } from './types';
+import { TalkToUsTab } from './components/TalkToUsTab';
+import { CategoryType, ThemeMode, StockMover, MarketIndex, ProDockTab, MainNavTab } from './types';
 import { INITIAL_TICKERS, MARKET_INDICES, STOCK_MOVERS_DATA } from './data/marketData';
 import { PRO_CATEGORIES_DATA } from './data/proMarketData';
 import { playTickSound } from './utils/soundEffects';
 
 export default function App() {
   const [theme, setTheme] = useState<ThemeMode>('dark');
+  const [activeNavTab, setActiveNavTab] = useState<MainNavTab>('markets');
   const [selectedCategory, setSelectedCategory] = useState<CategoryType>('US stocks');
   const [selectedRegion, setSelectedRegion] = useState<string>('us');
   const [selectedItem, setSelectedItem] = useState<StockMover | MarketIndex | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [activeDockTab, setActiveDockTab] = useState<ProDockTab>(null);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+
+  // Sync hash routing for single-page app tab navigation
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.hash === '#talk-to-us') {
+        setActiveNavTab('talk-to-us');
+      }
+      const onHashChange = () => {
+        if (window.location.hash === '#talk-to-us') {
+          setActiveNavTab('talk-to-us');
+        } else {
+          setActiveNavTab('markets');
+        }
+      };
+      window.addEventListener('hashchange', onHashChange);
+      return () => window.removeEventListener('hashchange', onHashChange);
+    }
+  }, []);
+
+  const handleSelectNavTab = (tab: MainNavTab) => {
+    playTickSound(soundEnabled);
+    setActiveNavTab(tab);
+    if (typeof window !== 'undefined') {
+      if (tab === 'talk-to-us') {
+        window.location.hash = 'talk-to-us';
+      } else if (window.location.hash === '#talk-to-us') {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    }
+  };
 
   const toggleTheme = () => {
     playTickSound(soundEnabled);
@@ -107,6 +139,8 @@ export default function App() {
         onToggleSound={toggleSound}
         activeDockTab={activeDockTab}
         onToggleDock={toggleDock}
+        activeNavTab={activeNavTab}
+        onSelectNavTab={handleSelectNavTab}
       />
 
       {/* Real-time Streaming Ticker Bar */}
@@ -116,43 +150,54 @@ export default function App() {
         onSelectTicker={handleSelectSymbol}
       />
 
-      {/* Main Trading Terminal Dashboard Container (Right padding for Pro dock strip) */}
-      <main className="flex-grow max-w-[1560px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10 pr-14 sm:pr-16">
-        {/* Markets Everywhere Category Selector */}
-        <HeroSection
-          theme={theme}
-          selectedCategory={selectedCategory}
-          onSelectCategory={(cat) => {
-            playTickSound(soundEnabled);
-            setSelectedCategory(cat);
-          }}
-          selectedRegion={selectedRegion}
-          onSelectRegion={(reg) => {
-            playTickSound(soundEnabled);
-            setSelectedRegion(reg);
-          }}
-        />
+      {/* Main Content Area: Markets Terminal or Talk to Us Tab */}
+      {activeNavTab === 'markets' ? (
+        <main className="flex-grow max-w-[1560px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10 pr-14 sm:pr-16">
+          {/* Markets Everywhere Category Selector */}
+          <HeroSection
+            theme={theme}
+            selectedCategory={selectedCategory}
+            onSelectCategory={(cat) => {
+              playTickSound(soundEnabled);
+              setSelectedCategory(cat);
+            }}
+            selectedRegion={selectedRegion}
+            onSelectRegion={(reg) => {
+              playTickSound(soundEnabled);
+              setSelectedRegion(reg);
+            }}
+            onOpenTalkToUs={() => handleSelectNavTab('talk-to-us')}
+          />
 
-        {/* Real-time Indices & Asset Cards Grid */}
-        <IndexCards
-          theme={theme}
-          indices={displayedIndices}
-          onSelectIndex={(index) => {
-            playTickSound(soundEnabled);
-            setSelectedItem(index);
-          }}
-        />
+          {/* Real-time Indices & Asset Cards Grid */}
+          <IndexCards
+            theme={theme}
+            indices={displayedIndices}
+            onSelectIndex={(index) => {
+              playTickSound(soundEnabled);
+              setSelectedItem(index);
+            }}
+          />
 
-        {/* Pro Market Movers & Screener Suite (Table / Heatmap / Grid) */}
-        <MarketMoversTable
-          theme={theme}
-          onSelectStock={(stock) => {
-            playTickSound(soundEnabled);
-            setSelectedItem(stock);
-          }}
-          soundEnabled={soundEnabled}
-        />
-      </main>
+          {/* Pro Market Movers & Screener Suite (Table / Heatmap / Grid) */}
+          <MarketMoversTable
+            theme={theme}
+            onSelectStock={(stock) => {
+              playTickSound(soundEnabled);
+              setSelectedItem(stock);
+            }}
+            soundEnabled={soundEnabled}
+          />
+        </main>
+      ) : (
+        <main className="flex-grow max-w-[1360px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pr-14 sm:pr-16">
+          <TalkToUsTab
+            theme={theme}
+            onBackToMarkets={() => handleSelectNavTab('markets')}
+            soundEnabled={soundEnabled}
+          />
+        </main>
+      )}
 
       {/* TradingView Iconic Right Pro Dock (Watchlist, Alerts, News Wire, Technical Gauge, Paper Trading) */}
       <ProRightDock
@@ -164,7 +209,10 @@ export default function App() {
       />
 
       {/* Professional Terminal Footer */}
-      <Footer theme={theme} />
+      <Footer
+        theme={theme}
+        onOpenTalkToUs={() => handleSelectNavTab('talk-to-us')}
+      />
 
       {/* Pro Technical Charting & Analysis Modal (Candlesticks, SMA, OHLC, Paper Trade) */}
       <StockDetailModal

@@ -3,9 +3,10 @@ import { ThemeMode } from '../types';
 
 interface FooterProps {
   theme: ThemeMode;
+  onOpenTalkToUs?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ theme }) => {
+export const Footer: React.FC<FooterProps> = ({ theme, onOpenTalkToUs }) => {
   return (
     <footer
       className={`border-t mt-16 text-xs transition-colors duration-200 ${
@@ -23,6 +24,17 @@ export const Footer: React.FC<FooterProps> = ({ theme }) => {
           >
             © 2025 TradingView
           </span>
+          {onOpenTalkToUs && (
+            <button
+              type="button"
+              onClick={onOpenTalkToUs}
+              className={`transition-colors font-medium text-[#2962ff] cursor-pointer ${
+                theme === 'dark' ? 'hover:text-white' : 'hover:text-[#1e53e5]'
+              }`}
+            >
+              Talk to Us (Community)
+            </button>
+          )}
           <a
             href="#"
             className={`transition-colors ${

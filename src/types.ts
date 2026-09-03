@@ -87,6 +87,8 @@ export type MoverTab =
 
 export type ThemeMode = 'dark' | 'light';
 
+export type MainNavTab = 'markets' | 'talk-to-us';
+
 export type ScreenerViewMode = 'table' | 'heatmap' | 'grid';
 
 export type ProDockTab = 'watchlist' | 'alerts' | 'news' | 'technicals' | 'paperTrade' | null;

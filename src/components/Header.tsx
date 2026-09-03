@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Globe, User, Sun, Moon, Check, ChevronDown, Volume2, VolumeX, Shield, PanelRight, Activity } from 'lucide-react';
-import { ThemeMode, ProDockTab } from '../types';
+import { Search, Globe, User, Sun, Moon, Check, ChevronDown, Volume2, VolumeX, Shield, PanelRight, Activity, MessageSquare, TrendingUp } from 'lucide-react';
+import { ThemeMode, ProDockTab, MainNavTab } from '../types';
 
 interface HeaderProps {
   theme: ThemeMode;
@@ -10,6 +10,8 @@ interface HeaderProps {
   onToggleSound: () => void;
   activeDockTab: ProDockTab;
   onToggleDock: () => void;
+  activeNavTab: MainNavTab;
+  onSelectNavTab: (tab: MainNavTab) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -20,6 +22,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSound,
   activeDockTab,
   onToggleDock,
+  activeNavTab,
+  onSelectNavTab,
 }) => {
   const [langOpen, setLangOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState('EN');
@@ -114,8 +118,48 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
 
+        {/* Primary Navigation Tabs: Markets & Talk to Us */}
+        <nav
+          aria-label="Main Navigation"
+          className={`flex items-center p-1 rounded-xl border text-xs font-semibold ${
+            theme === 'dark'
+              ? 'bg-[#1e222d] border-[#2a2e39]'
+              : 'bg-[#f0f3fa] border-[#e0e3eb]'
+          }`}
+        >
+          <button
+            id="nav-tab-markets"
+            type="button"
+            onClick={() => onSelectNavTab('markets')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              activeNavTab === 'markets'
+                ? theme === 'dark'
+                  ? 'bg-[#2a2e39] text-[#f0f3fa] shadow-sm'
+                  : 'bg-white text-[#131722] shadow-sm'
+                : 'text-[#787b86] hover:text-[#2962ff]'
+            }`}
+          >
+            <TrendingUp className="w-3.5 h-3.5" />
+            <span>Markets</span>
+          </button>
+          <button
+            id="nav-tab-talk-to-us"
+            type="button"
+            onClick={() => onSelectNavTab('talk-to-us')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+              activeNavTab === 'talk-to-us'
+                ? 'bg-[#2962ff] text-white shadow-sm'
+                : 'text-[#787b86] hover:text-[#2962ff]'
+            }`}
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Talk to Us</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#089981] animate-pulse" />
+          </button>
+        </nav>
+
         {/* Center: Live Terminal Ticker Feed Status & Session Clock */}
-        <div className="hidden lg:flex items-center gap-4 text-xs font-mono">
+        <div className="hidden xl:flex items-center gap-4 text-xs font-mono">
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#089981]/10 text-[#089981] font-semibold border border-[#089981]/20">
             <span className="w-2 h-2 rounded-full bg-[#089981] animate-pulse" />
             <span>NYSE OPEN</span>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Check, Globe2 } from 'lucide-react';
+import { ChevronDown, Check, Globe2, MessageSquare } from 'lucide-react';
 import { CategoryType, ThemeMode } from '../types';
 import { CATEGORIES, REGIONS } from '../data/marketData';
 
@@ -9,6 +9,7 @@ interface HeroSectionProps {
   onSelectCategory: (category: CategoryType) => void;
   selectedRegion: string;
   onSelectRegion: (region: string) => void;
+  onOpenTalkToUs?: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
@@ -17,6 +18,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onSelectCategory,
   selectedRegion,
   onSelectRegion,
+  onOpenTalkToUs,
 }) => {
   const [regionDropdownOpen, setRegionDropdownOpen] = useState(false);
 
@@ -136,6 +138,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </button>
           );
         })}
+
+        {onOpenTalkToUs && (
+          <button
+            id="filter-pill-talk-to-us"
+            type="button"
+            onClick={onOpenTalkToUs}
+            className={`px-4 sm:px-5 py-2 rounded-full text-sm font-semibold transition-all duration-150 whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+              theme === 'dark'
+                ? 'bg-[#2962ff]/15 text-[#2962ff] hover:bg-[#2962ff]/25 border border-[#2962ff]/30'
+                : 'bg-[#2962ff]/10 text-[#2962ff] hover:bg-[#2962ff]/20 border border-[#2962ff]/25'
+            }`}
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Talk to Us</span>
+          </button>
+        )}
       </div>
     </section>
   );
